@@ -1,122 +1,161 @@
 # Contributing
 
-Thanks for taking the time to contribute! This document explains how to get set up, our conventions, and how to submit changes.
+Thank you for contributing! Please read this guide before opening a pull request.
 
 ---
 
-## Getting started
+## Branch Strategy
 
-This project uses a devcontainer to give everyone the same development environment. You need:
+We follow a structured branching model designed for versioned releases.
 
-- [VS Code](https://code.visualstudio.com/)
-- [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
-- [Podman](https://podman.io/) (or Docker)
+```
+main          — production-ready code, tagged releases only
+develop       — integration branch, all features land here first
+feature/*     — new features (e.g. feature/add-auth)
+fix/*         — bug fixes (e.g. fix/login-crash)
+release/*     — release preparation (e.g. release/v1.0.0)
+hotfix/*      — urgent fixes branched directly off main
+```
+
+### Flow
+
+```
+feature/* ──→ develop ──→ release/* ──→ main (tagged vX.Y.Z)
+                                    hotfix/* ──→ main + develop
+```
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- [uv](https://github.com/astral-sh/uv) for dependency management
+- [Docker](https://www.docker.com/) / [Podman](https://podman.io/) for the devcontainer
+- [Make](https://www.gnu.org/software/make/) for running commands
+
+### Setup
 
 ```bash
-git clone https://github.com/your-org/your-repo.git
-cd your-repo
-code .
+# Install dependencies and pre-commit hooks
+make install
 ```
 
-Then in VS Code: **Command Palette → "Dev Containers: Reopen in Container"**
+### Useful commands
 
-Dependencies are installed automatically via `uv sync` when the container starts.
+| Command | Description |
+|---|---|
+| `make lint` | Run ruff linter |
+| `make format` | Format code with ruff |
+| `make fix` | Auto-fix lint issues |
+| `make test` | Run tests |
+| `make check` | Run all checks (lint + format + tests) |
+| `make pre-commit-run` | Run pre-commit hooks on all files |
+| `make build` | Build the package |
+| `make clean` | Remove build artifacts and caches |
+| `make bump-patch` | Bump patch version, commit and tag |
+| `make bump-minor` | Bump minor version, commit and tag |
+| `make bump-major` | Bump major version, commit and tag |
 
 ---
 
-## Day-to-day workflow
+## Making a Contribution
 
-All commands are run inside the devcontainer terminal.
+### 1. Branch off develop
 
 ```bash
-# Install / sync dependencies
-uv sync
-
-# Add a new dependency
-uv add <package>
-
-# Run tests
-uv run pytest
-
-# Lint
-uv run ruff check .
-
-# Format
-uv run ruff format .
+git checkout develop
+git pull origin develop
+git checkout -b feature/your-feature-name
 ```
 
-Code is auto-formatted on save in VS Code via the Ruff extension.
+Use the appropriate prefix: `feature/`, `fix/`, or `hotfix/`.
 
----
+### 2. Make your changes
 
-## Branch conventions
-
-Branch off `main` using one of these prefixes:
-
-| Prefix | Use for |
-|--------|---------|
-| `feat/` | New features |
-| `fix/` | Bug fixes |
-| `chore/` | Maintenance, deps, config |
-| `docs/` | Documentation only |
-| `refactor/` | Code changes with no behaviour change |
-
-Example: `feat/add-parquet-output`
-
----
-
-## Commit messages
-
-We follow [Conventional Commits](https://www.conventionalcommits.org/):
+Keep commits small and focused. Write clear commit messages:
 
 ```
-feat: add parquet output format
-fix: handle empty dataframe in transform
-chore: update uv.lock
-docs: add usage examples to README
+Add user authentication endpoint
+Fix null pointer in config loader
+Refactor database connection pool
 ```
 
-Keep the subject line under 72 characters. Add a body if the change needs more context.
-
----
-
-## Before opening a pull request
-
-Make sure these all pass:
+### 3. Run checks before pushing
 
 ```bash
-uv run ruff check .
-uv run ruff format --check .
-uv run pytest
+make check
 ```
 
-A CI pipeline will run the same checks on your PR — it's easier to catch issues locally first.
+This runs lint, format check, and tests. All must pass before opening a PR.
+
+### 4. Push and open a Pull Request
+
+```bash
+git push origin feature/your-feature-name
+```
+
+Open a PR on GitHub targeting **`develop`** (never directly to `main`). Fill in the PR description explaining what changed and why.
 
 ---
 
-## Pull request process
+## CI Pipeline
 
-1. Open a PR against `main` with a clear title and description
-2. Link any related issues
-3. A maintainer will review within a few days
-4. Address any feedback, then request a re-review
-5. Once approved, the maintainer merges
+All PRs must pass CI before merging. The pipeline runs automatically on every PR and checks:
 
-Keep PRs focused — one concern per PR makes reviewing much easier.
+- Ruff linting
+- Ruff format check
+- Pytest test suite
 
----
-
-## Reporting issues
-
-Open an issue and include:
-
-- What you expected to happen
-- What actually happened
-- Steps to reproduce
-- Python version and OS (if relevant)
+PRs that fail CI will not be merged.
 
 ---
 
-## Code style
+## Release Process
 
-Ruff handles everything — formatting, import sorting, and linting. There's no manual style guide to follow beyond what Ruff enforces. Configuration lives in `pyproject.toml` under `[tool.ruff]`.
+Releases are managed by maintainers using [`bump-my-version`](https://github.com/callowayproject/bump-my-version) to automate version bumping, committing, and tagging.
+
+### Version scheme
+
+We follow [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATCH`
+
+| Bump | When | Command |
+|---|---|---|
+| `patch` | Bug fixes, small improvements | `make bump-patch` |
+| `minor` | New backwards-compatible features | `make bump-minor` |
+| `major` | Breaking changes | `make bump-major` |
+
+### Steps
+
+```bash
+# 1. Cut a release branch from develop
+git checkout develop
+git pull origin develop
+git checkout -b release/vX.Y.Z
+
+# 2. Bump the version — updates pyproject.toml, commits, and tags automatically
+make bump-patch   # or bump-minor / bump-major
+
+# 3. Push the branch and the tag
+git push origin release/vX.Y.Z
+git push origin --tags   # triggers the release pipeline on GitHub
+
+# 4. Open a PR: release/vX.Y.Z → main
+# 5. After merge, sync develop
+git checkout develop
+git merge main
+git push origin develop
+```
+
+Pushing the tag triggers the release pipeline which runs all checks, builds the package, and publishes a GitHub Release automatically.
+
+---
+
+## Branch Protection
+
+Both `main` and `develop` are protected:
+
+- Direct pushes are not allowed
+- All changes must come through a Pull Request
+- CI must pass before merging
+- At least one reviewer approval is required on `main`
