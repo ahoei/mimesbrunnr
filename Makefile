@@ -58,3 +58,13 @@ pre-commit-run: ## Run pre-commit hooks against all files
 clean: ## Remove build artifacts and cache files
 	rm -rf dist/ .coverage coverage.xml htmlcov/ .pytest_cache/ .ruff_cache/
 	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+
+.PHONY: tag-release
+tag-release: ## Usage: make tag-release VERSION=1.0.0
+	git checkout main
+	git pull origin main
+	git tag v$(VERSION)
+	git push origin v$(VERSION)
+	git checkout develop
+	git merge main
+	git push origin develop
