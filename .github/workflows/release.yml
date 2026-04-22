@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write  # needed to create GitHub releases
+      contents: write
 
     steps:
       - name: Checkout code

@@ -59,8 +59,8 @@ pre-commit-run: ## Run pre-commit hooks against all files
 
 # ── Release ────────────────────────────────────────────────────────────────
 .PHONY: release
-release: ## Tag and push a release. Usage: make release VERSION=1.1.0
-	@test -n "$(VERSION)" || (echo "ERROR: VERSION is required. Usage: make release VERSION=1.1.0" && exit 1)
+release: ## Tag and push a release. Usage: make release VERSION=1.2.0
+	@test -n "$(VERSION)" || (echo "ERROR: VERSION is required. Usage: make release VERSION=1.2.0" && exit 1)
 	git checkout main
 	git pull origin main
 	git tag v$(VERSION)
