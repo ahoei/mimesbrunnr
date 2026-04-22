@@ -11,17 +11,17 @@ We follow a structured branching model designed for versioned releases.
 ```
 main          — production-ready code, tagged releases only
 develop       — integration branch, all features land here first
-feature/*     — new features (e.g. feature/add-auth)
-fix/*         — bug fixes (e.g. fix/login-crash)
-release/*     — release preparation (e.g. release/v1.0.0)
+feature/*     — new features        (e.g. feature/add-auth)
+fix/*         — bug fixes           (e.g. fix/login-crash)
+release/*     — release preparation (e.g. release/v1.1.0)
 hotfix/*      — urgent fixes branched directly off main
 ```
 
 ### Flow
 
 ```
-feature/* ──→ develop ──→ release/* ──→ main (tagged vX.Y.Z)
-                                    hotfix/* ──→ main + develop
+feature/* ──→ develop ──→ release/* ──→ main ──→ tag vX.Y.Z ──→ release pipeline
+                                    hotfix/* ──→ main + PR back to develop
 ```
 
 ---
@@ -37,7 +37,6 @@ feature/* ──→ develop ──→ release/* ──→ main (tagged vX.Y.Z)
 ### Setup
 
 ```bash
-# Install dependencies and pre-commit hooks
 make install
 ```
 
@@ -53,9 +52,7 @@ make install
 | `make pre-commit-run` | Run pre-commit hooks on all files |
 | `make build` | Build the package |
 | `make clean` | Remove build artifacts and caches |
-| `make bump-patch` | Bump patch version, commit and tag |
-| `make bump-minor` | Bump minor version, commit and tag |
-| `make bump-major` | Bump major version, commit and tag |
+| `make release VERSION=1.1.0` | Tag and push a release |
 
 ---
 
@@ -101,7 +98,7 @@ Open a PR on GitHub targeting **`develop`** (never directly to `main`). Fill in 
 
 ## CI Pipeline
 
-All PRs must pass CI before merging. The pipeline runs automatically on every PR and checks:
+All PRs must pass CI before merging. The pipeline runs automatically on every PR to `develop` and `main`, and checks:
 
 - Ruff linting
 - Ruff format check
@@ -113,17 +110,17 @@ PRs that fail CI will not be merged.
 
 ## Release Process
 
-Releases are managed by maintainers using [`bump-my-version`](https://github.com/callowayproject/bump-my-version) to automate version bumping, committing, and tagging.
+Releases are managed by maintainers.
 
 ### Version scheme
 
 We follow [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATCH`
 
-| Bump | When | Command |
-|---|---|---|
-| `patch` | Bug fixes, small improvements | `make bump-patch` |
-| `minor` | New backwards-compatible features | `make bump-minor` |
-| `major` | Breaking changes | `make bump-major` |
+| Bump | When |
+|---|---|
+| `patch` | Bug fixes, small improvements |
+| `minor` | New backwards-compatible features |
+| `major` | Breaking changes |
 
 ### Steps
 
@@ -131,23 +128,41 @@ We follow [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATCH`
 # 1. Cut a release branch from develop
 git checkout develop
 git pull origin develop
-git checkout -b release/vX.Y.Z
+git checkout -b release/v1.1.0
 
-# 2. Bump the version — updates pyproject.toml, commits, and tags automatically
-make bump-patch   # or bump-minor / bump-major
+# 2. Push and open a PR: release/v1.1.0 → main
+git push origin release/v1.1.0
+# Open PR on GitHub, wait for CI to pass, get approval, merge
 
-# 3. Push the branch and the tag
-git push origin release/vX.Y.Z
-git push origin --tags   # triggers the release pipeline on GitHub
+# 3. Tag the release from main
+git checkout main
+git pull origin main
+make release VERSION=1.1.0
+# This tags v1.1.0 and pushes it — triggering the release pipeline
 
-# 4. Open a PR: release/vX.Y.Z → main
-# 5. After merge, sync develop
-git checkout develop
-git merge main
-git push origin develop
+# 4. Open a PR: main → develop to keep them in sync
+# Do this on GitHub: base: develop ← compare: main
+# Title: chore: sync develop with main after v1.1.0
 ```
 
-Pushing the tag triggers the release pipeline which runs all checks, builds the package, and publishes a GitHub Release automatically.
+The release pipeline automatically bumps the version in `pyproject.toml`, builds the package, and publishes a GitHub Release with auto-generated release notes.
+
+### Hotfixes
+
+For urgent production fixes:
+
+```bash
+# Branch off main, not develop
+git checkout main
+git pull origin main
+git checkout -b hotfix/critical-bug-fix
+
+# Fix, commit, push, open PR → main
+# After merge, tag a patch release
+make release VERSION=1.1.1
+
+# Open a PR: main → develop to bring the fix back
+```
 
 ---
 

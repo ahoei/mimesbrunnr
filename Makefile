@@ -2,7 +2,6 @@
 # Project Makefile
 # Usage: make <target>
 # ---------------------------------------------------------------------------
-
 .DEFAULT_GOAL := help
 SHELL         := /bin/bash
 PYTHON        := uv run
@@ -11,7 +10,7 @@ PYTHON        := uv run
 .PHONY: help
 help: ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
-		| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-22s\033[0m %s\n", $$1, $$2}'
+        | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-22s\033[0m %s\n", $$1, $$2}'
 
 # ── Python / Package ───────────────────────────────────────────────────────
 .PHONY: install
@@ -50,23 +49,25 @@ build: ## Build the Python package
 .PHONY: check
 check: lint format-check test ## Run all checks (lint + format + tests) — run before pushing
 
+.PHONY: pre-commit-install
+pre-commit-install: ## Install pre-commit hooks
+	uv run pre-commit install
+
 .PHONY: pre-commit-run
 pre-commit-run: ## Run pre-commit hooks against all files
 	$(PYTHON) pre-commit run --all-files
 
+# ── Release ────────────────────────────────────────────────────────────────
+.PHONY: release
+release: ## Tag and push a release. Usage: make release VERSION=1.1.0
+	@test -n "$(VERSION)" || (echo "ERROR: VERSION is required. Usage: make release VERSION=1.1.0" && exit 1)
+	git checkout main
+	git pull origin main
+	git tag v$(VERSION)
+	git push origin v$(VERSION)
+
+# ── Clean ──────────────────────────────────────────────────────────────────
 .PHONY: clean
 clean: ## Remove build artifacts and cache files
 	rm -rf dist/ .coverage coverage.xml htmlcov/ .pytest_cache/ .ruff_cache/
 	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
-
-
-# ── Release ───────────────────────────────────────────────────────
-.PHONY: bump-patch bump-minor bump-major
-bump-patch: ## Bump patch version (1.0.0 → 1.0.1)
-	uv run bump-my-version bump patch
-
-bump-minor: ## Bump minor version (1.0.0 → 1.1.0)
-	uv run bump-my-version bump minor
-
-bump-major: ## Bump major version (1.0.0 → 2.0.0)
-	uv run bump-my-version bump major
