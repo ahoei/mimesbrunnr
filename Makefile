@@ -58,3 +58,15 @@ pre-commit-run: ## Run pre-commit hooks against all files
 clean: ## Remove build artifacts and cache files
 	rm -rf dist/ .coverage coverage.xml htmlcov/ .pytest_cache/ .ruff_cache/
 	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+
+
+# ── Release ───────────────────────────────────────────────────────
+.PHONY: bump-patch bump-minor bump-major
+bump-patch: ## Bump patch version (1.0.0 → 1.0.1)
+	uv run bump-my-version bump patch
+
+bump-minor: ## Bump minor version (1.0.0 → 1.1.0)
+	uv run bump-my-version bump minor
+
+bump-major: ## Bump major version (1.0.0 → 2.0.0)
+	uv run bump-my-version bump major
