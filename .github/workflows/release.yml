@@ -5,6 +5,9 @@ on:
     tags:
       - "v*.*.*"
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -30,6 +33,11 @@ jobs:
 
       - name: Run tests
         run: uv run pytest --cov-report=xml
+
+      - name: Bump version in pyproject.toml
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          sed -i "s/^version = .*/version = \"$VERSION\"/" pyproject.toml
 
       - name: Build package
         run: uv build
