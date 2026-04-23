@@ -1,8 +1,11 @@
 [project]
 name = "mimesbrunnr"
 version = "1.1.0"
-description = "Add your description here"
+description = "Boilerplate project for Python Programing"
 readme = "README.md"
+authors = [
+    "Andreas Sandvik Hoeimyr <ahoei01@proton.me>",
+]
 requires-python = ">=3.13"
 dependencies = [
     "enums>=0.0.2",
