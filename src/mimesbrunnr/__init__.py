@@ -1,5 +1,5 @@
-"""Mimesbrunnr transformation package."""
+"""Mimesbrunnr package"""
 
+from importlib.metadata import version
 
-def main() -> None:
-	print("Hello Mime!")
+__version__ = version("mimesbrunnr")
