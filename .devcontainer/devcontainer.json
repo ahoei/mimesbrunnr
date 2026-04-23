@@ -29,8 +29,6 @@
         "yzhang.markdown-all-in-one",
         "redhat.vscode-yaml",
         "mhutchie.git-graph",
-        "lakshmikanthayyadevara.githooks",
-        "ms-vscode.makefile-tools",
         "ryanluker.vscode-coverage-gutters"
       ],
       "settings": {
