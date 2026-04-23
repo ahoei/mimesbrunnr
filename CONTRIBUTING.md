@@ -133,3 +133,9 @@ We follow [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATCH`
 - All changes must come through a Pull Request
 - CI must pass before merging
 - At least one reviewer approval is required
+
+## Commit Messages
+
+This project follows [Conventional Commits](https://www.conventionalcommits.org/).
+Format: `<type>: <description>`
+Types: `feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `ci`
