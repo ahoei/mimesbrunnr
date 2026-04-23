@@ -3,8 +3,11 @@ FROM mcr.microsoft.com/devcontainers/python:3.13
 # Install uv as the vscode user
 USER vscode
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-
 ENV PATH="/home/vscode/.local/bin:${PATH}"
 ENV UV_LINK_MODE=copy
 
 WORKDIR /workspace
+
+# Pre-create the venv so VS Code resolves the interpreter on container start
+COPY --chown=vscode:vscode pyproject.toml uv.lock ./
+RUN uv sync --all-extras --frozen

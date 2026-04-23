@@ -10,20 +10,26 @@
     "source=mimesbrunnr-data,target=/data,type=volume"
   ],
   "remoteUser": "vscode",
+  "runArgs": [
+    "--userns=keep-id"
+  ],
+  "containerEnv": {
+    "UV_LINK_MODE": "copy"
+  },
   "features": {},
   "customizations": {
     "vscode": {
       "extensions": [
         "charliermarsh.ruff",
-        "ms-python.python"
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "tamasfe.even-better-toml"
       ],
       "settings": {
-        "editor.formatOnSave": true,
-        "[python]": {
-          "editor.defaultFormatter": "charliermarsh.ruff"
-        }
+        "python.defaultInterpreterPath": ".venv/bin/python",
+        "python.terminal.activateEnvironment": true
       }
     }
   },
-  "postCreateCommand": "uv sync"
+  "postCreateCommand": "uv run pre-commit install"
 }
