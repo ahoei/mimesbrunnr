@@ -37,7 +37,7 @@ test-ci: ## Run tests in CI mode (XML coverage)
 	$(PYTHON) pytest --cov-report=xml
 
 .PHONY: check
-check: lint test ## Lint + format-check + tests (pre-push gate)
+check: lint test-ci ## Lint + format-check + tests (pre-push gate)
 
 .PHONY: pre-commit
 pre-commit: ## Run pre-commit hooks on all files
@@ -48,9 +48,8 @@ build: ## Build the package
 	uv build
 
 .PHONY: release
-release: ## Tag and push a release  (VERSION=x.y.z required)
+release: ## Push a release tag to trigger the CI release pipeline (VERSION=x.y.z required)
 	@test -n "$(VERSION)" || (echo "ERROR: VERSION required — make release VERSION=1.2.0" && exit 1)
-	git checkout main && git pull origin main
 	git tag v$(VERSION) && git push origin v$(VERSION)
 
 .PHONY: clean

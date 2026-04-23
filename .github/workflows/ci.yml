@@ -1,16 +1,12 @@
 name: CI
-
 on:
   pull_request:
     branches: [main]
-
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   check:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -19,16 +15,10 @@ jobs:
         uses: astral-sh/setup-uv@v5
 
       - name: Install dependencies
-        run: uv sync --all-extras
+        run: make install
 
-      - name: Lint
-        run: uv run ruff check src tests
-
-      - name: Format check
-        run: uv run ruff format --check src tests
-
-      - name: Run tests
-        run: uv run pytest --cov-report=xml
+      - name: Lint, format-check & test
+        run: make check
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
