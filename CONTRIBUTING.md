@@ -26,7 +26,7 @@ feature/your-thing  →  PR + CI  →  main  →  tag (optional release)
 ### Prerequisites
 
 - [uv](https://github.com/astral-sh/uv) for dependency management
-- [Docker](https://www.docker.com/) / [Podman](https://podman.io/) for the devcontainer
+- [Podman](https://podman.io/) / [Docker](https://www.docker.com/) for the devcontainer
 - [Make](https://www.gnu.org/software/make/) for running commands
 
 ### Setup
@@ -35,19 +35,44 @@ feature/your-thing  →  PR + CI  →  main  →  tag (optional release)
 make install
 ```
 
-### Useful commands
+### Useful Commands
 
 | Command | Description |
 |---|---|
-| `make lint` | Run ruff linter |
-| `make format` | Format code with ruff |
-| `make fix` | Auto-fix lint issues |
-| `make test` | Run tests |
-| `make check` | Run all checks (lint + format + tests) |
-| `make pre-commit-run` | Run pre-commit hooks on all files |
+| `make lint` | Lint and format-check (no writes) |
+| `make fix` | Auto-fix lint and formatting |
+| `make test` | Run tests with coverage |
+| `make check` | Lint + format-check + tests (pre-push gate) |
+| `make pre-commit` | Run pre-commit hooks on all files |
 | `make build` | Build the package |
 | `make clean` | Remove build artifacts and caches |
 | `make release VERSION=1.2.0` | Tag and push a release |
+
+---
+
+## Commit Messages
+
+This project follows [Conventional Commits](https://www.conventionalcommits.org/).
+
+Format: `<type>: <description>`
+
+| Type | When |
+|---|---|
+| `feat` | New capability |
+| `fix` | Bug fix |
+| `chore` | Maintenance, deps, config |
+| `docs` | Markdown, docstrings |
+| `refactor` | No behaviour change |
+| `test` | Adding or fixing tests |
+| `ci` | Pipeline changes |
+
+Examples:
+```
+feat: add parse() method to MimesbrunnrClient
+fix: handle None response from upstream API
+ci: collapse lint and test into make check
+docs: add CHANGELOG and SECURITY markdown files
+```
 
 ---
 
@@ -65,13 +90,7 @@ Use a descriptive branch name that reflects the work: `feature/add-auth`, `fix/l
 
 ### 2. Make your changes
 
-Keep commits small and focused. Write clear commit messages:
-
-```
-Add user authentication endpoint
-Fix null pointer in config loader
-Refactor database connection pool
-```
+Keep commits small and focused. Follow [Conventional Commits](#commit-messages) for message format.
 
 ### 3. Run checks before pushing
 
@@ -87,7 +106,8 @@ This runs lint, format check, and tests. All must pass before opening a PR.
 git push origin feature/your-thing
 ```
 
-Open a PR on GitHub targeting **`main`**. Fill in the PR description explaining what changed and why. Get at least one approval and wait for CI to pass before merging.
+Open a PR on GitHub targeting **`main`**. Fill in the PR description explaining what changed and why.
+Get at least one approval and wait for CI to pass before merging.
 
 ---
 
@@ -95,8 +115,7 @@ Open a PR on GitHub targeting **`main`**. Fill in the PR description explaining 
 
 All PRs must pass CI before merging. The pipeline runs automatically on every PR to `main` and checks:
 
-- Ruff linting
-- Ruff format check
+- Ruff linting and format check
 - Pytest test suite
 
 PRs that fail CI will not be merged.
@@ -111,9 +130,11 @@ Not every merge to `main` is a release. When you're ready to cut a version:
 make release VERSION=1.2.0
 ```
 
-This tags `v1.2.0` on `main` and pushes it, which triggers the release pipeline. The pipeline runs all checks, bumps the version in `pyproject.toml`, builds the package, and publishes a GitHub Release with auto-generated release notes.
+This tags `v1.2.0` on `main` and pushes it, which triggers the release pipeline. The pipeline runs
+all checks, bumps the version in `pyproject.toml`, builds the package, and publishes a GitHub
+Release with auto-generated release notes.
 
-### Version scheme
+### Version Scheme
 
 We follow [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATCH`
 
@@ -133,9 +154,3 @@ We follow [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATCH`
 - All changes must come through a Pull Request
 - CI must pass before merging
 - At least one reviewer approval is required
-
-## Commit Messages
-
-This project follows [Conventional Commits](https://www.conventionalcommits.org/).
-Format: `<type>: <description>`
-Types: `feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `ci`
