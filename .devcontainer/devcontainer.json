@@ -23,7 +23,15 @@
         "charliermarsh.ruff",
         "ms-python.python",
         "ms-python.vscode-pylance",
-        "tamasfe.even-better-toml"
+        "tamasfe.even-better-toml",
+        "njpwerner.autodocstring",
+        "ms-toolsai.jupyter",
+        "yzhang.markdown-all-in-one",
+        "redhat.vscode-yaml",
+        "mhutchie.git-graph",
+        "lakshmikanthayyadevara.githooks",
+        "ms-vscode.makefile-tools",
+        "ryanluker.vscode-coverage-gutters"
       ],
       "settings": {
         "python.defaultInterpreterPath": ".venv/bin/python",
