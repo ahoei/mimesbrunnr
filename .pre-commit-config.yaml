@@ -10,10 +10,17 @@ repos:
       - id: check-merge-conflict
       - id: debug-statements
       - id: check-docstring-first
-
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.11.6
     hooks:
       - id: ruff
         args: [--fix]
       - id: ruff-format
+  - repo: local
+    hooks:
+      - id: obsidian-index
+        name: Regenerate Obsidian workspace index
+        entry: python docs/obsidian/obsidian-index.py docs/obsidian
+        language: python
+        pass_filenames: false
+        always_run: true
