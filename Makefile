@@ -10,7 +10,7 @@ SRC           := src tests
 .PHONY: help
 help: ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
-	| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-18s\033[0m %s\n", $$1, $$2}'
+	    | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-18s\033[0m %s\n", $$1, $$2}'
 
 # ── Python / Package ───────────────────────────────────────────────────────
 .PHONY: install
@@ -56,3 +56,8 @@ release: ## Push a release tag to trigger the CI release pipeline (VERSION=x.y.z
 clean: ## Remove build artifacts and caches
 	rm -rf dist/ .coverage coverage.xml htmlcov/ .pytest_cache/ .ruff_cache/
 	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+
+# ── Obsidian ───────────────────────────────────────────────────────────────
+.PHONY: obsidian-index
+obsidian-index: ## Regenerate docs/obsidian/meta/workspace-index.md
+	$(PYTHON) docs/obsidian/obsidian-index.py docs/obsidian
