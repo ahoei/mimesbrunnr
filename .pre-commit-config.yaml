@@ -16,11 +16,3 @@ repos:
       - id: ruff
         args: [--fix]
       - id: ruff-format
-  - repo: local
-    hooks:
-      - id: obsidian-index
-        name: Regenerate Obsidian workspace index
-        entry: python docs/obsidian/obsidian-index.py docs/obsidian
-        language: python
-        pass_filenames: false
-        always_run: true
